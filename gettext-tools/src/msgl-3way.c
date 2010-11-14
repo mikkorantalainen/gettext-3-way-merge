@@ -482,7 +482,7 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 
                     if ((tmp->msgstr_len == 0) ||
                             (tmp->is_fuzzy && !mpb->is_fuzzy) ||
-                            (message_str_equal(mp, mpor, true))){
+                            (mpor && message_str_equal(mp, mpor, true))){
                         tmp->msgstr = new_msgstr;
                         tmp->msgstr_len = mpb->msgstr_len;
                         tmp->is_fuzzy = mpb->is_fuzzy;
