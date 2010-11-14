@@ -50,6 +50,16 @@
 
 bool msg3way_has_merges = false;
 
+static bool str_ismergeline(const char *s)
+{
+    return strncmp("#-#-#-#-#", s, 9);
+}
+
+static bool str_isequal(const char *s1, const char* s2)
+{
+    return (strcmp(s1, s2) == 0);
+}
+
 static bool msg3way_headers(message_ty* fin, const message_ty* remote)
 {
     char * final;
@@ -438,6 +448,10 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 tmp = message_copy (mp);
                 tmp->obsolete = mp->obsolete;
                 message_list_append (mlp_dom, tmp);
+                string_list_remove_if(tmp->comment, str_ismergeline);
+                string_list_collapse_if(tmp->comment, str_isequal);
+                string_list_remove_if(tmp->comment_dot, str_ismergeline);
+                string_list_collapse_if(tmp->comment_dot, str_isequal);
               }
 
             if ((!is_header (mp) && mp->is_fuzzy)
@@ -501,6 +515,7 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                             tmp->alternative[i].msgstr_len = tmp->msgstr_len;
                             tmp->alternative[i].msgstr_end = tmp->msgstr + tmp->msgstr_len;
                             tmp->alternative[i].comment = tmp->comment;
+
                             tmp->alternative[i].comment_dot = tmp->comment_dot;
                             /* must zero the tmp, especially the lists */
                             tmp->msgstr = NULL;
@@ -516,7 +531,13 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                             tmp->alternative[i].msgstr_len = mpb->msgstr_len;
                             tmp->alternative[i].msgstr_end = new_msgstr + mpb->msgstr_len;
                             tmp->alternative[i].comment = mpb->comment;
+                            string_list_remove_if(tmp->alternative[i].comment, str_ismergeline);
+                            string_list_collapse_if(tmp->alternative[i].comment, str_isequal);
+
                             tmp->alternative[i].comment_dot = mpb->comment_dot;
+                            string_list_remove_if(tmp->alternative[i].comment_dot, str_ismergeline);
+                            string_list_collapse_if(tmp->alternative[i].comment_dot, str_isequal);
+
                         }
                         tmp->alternative_count = i + 1;
                     }
@@ -572,6 +593,11 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 tmp = message_copy (mp);
                 tmp->obsolete = mp->obsolete;
                 message_list_append (mlp_dom, tmp);
+                string_list_remove_if(tmp->comment, str_ismergeline);
+                string_list_collapse_if(tmp->comment, str_isequal);
+                string_list_remove_if(tmp->comment_dot, str_ismergeline);
+                string_list_collapse_if(tmp->comment_dot, str_isequal);
+
             }
           }
       }
