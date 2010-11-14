@@ -203,3 +203,11 @@
 /test-lseek.sh
 /test-strnlen.c
 /test-sys_wait.h
+
+/.deps/
+/arg-nonnull.h
+/c++defs.h
+/test-posix_spawn1.sh
+/test-posix_spawn2.sh
+/unused-parameter.h
+/warn-on-use.h

@@ -8,6 +8,7 @@
 /uniname
 /unistr
 /uniwidth
+/.libs
 
 # Files brought in by gnulib-tool:
 /Makefile.gnulib
@@ -382,3 +383,38 @@
 /term_styled_ostream.vt.h
 
 /waitpid.c
+
+/alloca.h
+/arg-nonnull.h
+/c++defs.h
+/charset.alias
+/configmake.h
+/fcntl.h
+/getopt.h
+/glib.h
+/glibconfig.h
+/iconv.h
+/libcroco_rpl.la
+/libgettextlib.la
+/libglib_rpl.la
+/locale.h
+/ref-add.sed
+/ref-del.sed
+/signal.h
+/spawn.h
+/stdio.h
+/stdlib.h
+/string.h
+/sys/
+/time.h
+/uniconv.h
+/unilbrk.h
+/uniname.h
+/unistd.h
+/unistr.h
+/unitypes.h
+/uniwidth.h
+/unused-parameter.h
+/warn-on-use.h
+/wchar.h
+/wctype.h

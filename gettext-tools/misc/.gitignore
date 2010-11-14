@@ -3,4 +3,8 @@
 
 # Files distributed but not under version control:
 /archive.cvs.tar.gz
-
+/x-to-1
+/autopoint
+/convert-archive
+/elc-stamp
+/gettextize
