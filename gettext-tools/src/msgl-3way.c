@@ -50,6 +50,58 @@
 
 bool msg3way_has_merges = false;
 
+static bool msg3way_headers(message_ty* fin, const message_ty* remote)
+{
+    char * final;
+    const char *rev_datea, *rev_dateb;
+    const char *por_hdr = "PO-Revision-Date:";
+    const size_t por_hdrlen = strlen(por_hdr);
+    bool local_last = true;
+    size_t n;
+    
+    /* as a special step, be sure to include copyright headers from
+       both sources
+    */
+    if (remote->comment)
+        for(n=0; n < remote->comment->nitems; n++)
+            if (strcasestr(remote->comment->item[n], "copyright") &&
+                !string_list_member(fin->comment,remote->comment->item[n]))
+              string_list_append(fin->comment,remote->comment->item[n]);
+        
+    if (!remote->msgstr_len)
+        return true;
+    else if (!fin->msgstr_len){
+        fin->msgstr = remote->msgstr;
+        fin->msgstr_len = remote->msgstr_len;
+        return true;
+    }
+    
+    rev_datea = c_strstr(fin->msgstr, por_hdr)+por_hdrlen;
+    rev_dateb = c_strstr(remote->msgstr, por_hdr)+por_hdrlen;
+    
+    for(;rev_datea && rev_dateb; rev_datea++, rev_dateb++){
+        /* we only want to compare the string part of fin, remote
+           after the revision-date header, to see which one is
+           more recent
+        */
+        if (*rev_datea == '\n' || *rev_dateb == '\n')
+            break;
+        if ((rev_datea >= fin->msgstr + fin->msgstr_len) ||
+              (rev_dateb >= remote->msgstr + remote->msgstr_len))
+            break;
+        if ( *rev_dateb > *rev_datea){
+            local_last = false;
+        }
+    }
+
+    if (!local_last){
+        fin->msgstr = remote->msgstr;
+        fin->msgstr_len = remote->msgstr_len;
+    }
+
+    return true;
+}
+
 msgdomain_list_ty *
        merge_3way_msgdomain_list (const char *a_file, const char* b_file,
                                   const char *origin_file,
@@ -417,6 +469,8 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 mpor = NULL;
             
             /* Here is the core 3-way algorithm: */
+            if (is_header(mp) && (mpb) && msg3way_headers(tmp, mpb))
+                continue ;
             if (mpb){
                 /* if msg has been added/changed at B - Orig, add to A */
                 if (!mpor || !message_str_equal(mpb, mpor, true)) {
