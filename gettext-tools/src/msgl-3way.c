@@ -48,6 +48,8 @@
 
 #define _(str) gettext (str)
 
+bool msg3way_has_merges = false;
+
 msgdomain_list_ty *
        merge_3way_msgdomain_list (const char *a_file, const char* b_file,
                                   const char *origin_file,
@@ -417,40 +419,51 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
             /* Here is the core 3-way algorithm: */
             if (mpb){
                 /* if msg has been added/changed at B - Orig, add to A */
-                if (!mpor || !message_equal(mpb, mpor, true)) {
+                if (!mpor || !message_str_equal(mpb, mpor, true)) {
                     
                     char *new_msgstr;
                     new_msgstr = XNMALLOC(mpb->msgstr_len + 1, char);
                     memcpy(new_msgstr, mpb->msgstr, mpb->msgstr_len);
                     new_msgstr[mpb->msgstr_len] = '\0';
                 
-                    if (tmp->msgstr_len == 0){
-                        /* Only appears at B, A is untranslated */
-                        tmp->msgstr = new_msgstr;
-                        tmp->msgstr_len = mpb->msgstr_len;
-                        tmp->is_fuzzy = mpb->is_fuzzy;
-                    }
-                    else if (tmp->is_fuzzy && !mpb->is_fuzzy){
+                    if ((tmp->msgstr_len == 0) ||
+                            (tmp->is_fuzzy && !mpb->is_fuzzy) ||
+                            (message_str_equal(mp, mpor, true))){
                         tmp->msgstr = new_msgstr;
                         tmp->msgstr_len = mpb->msgstr_len;
                         tmp->is_fuzzy = mpb->is_fuzzy;
                     }
                     else {
                         /* put as alternate */
-                        char *id = xasprintf ("#-#-#-#-#  %s  #-#-#-#-#",
-                                                identifications[1][k]);
                         size_t nbytes;
-
-
                         i = tmp->alternative_count;
-                        nbytes = (i + 1) * sizeof (struct altstr);
+                        nbytes = (i + 2) * sizeof (struct altstr);
                         tmp->alternative = xrealloc (tmp->alternative, nbytes);
-                        tmp->alternative[i].msgstr = new_msgstr;
-                        tmp->alternative[i].msgstr_len = mpb->msgstr_len;
-                        tmp->alternative[i].msgstr_end = new_msgstr + mpb->msgstr_len;
-                        tmp->alternative[i].comment = mpb->comment;
-                        tmp->alternative[i].comment_dot = mpb->comment_dot;
-                        tmp->alternative[i].id = id;
+
+                        { /* one from A */
+                            tmp->alternative[i].id= xasprintf ("#-#-#-#-#  %s  #-#-#-#-#",
+                                                    identifications[0][k]);
+                            tmp->alternative[i].msgstr = tmp->msgstr;
+                            tmp->alternative[i].msgstr_len = tmp->msgstr_len;
+                            tmp->alternative[i].msgstr_end = tmp->msgstr + tmp->msgstr_len;
+                            tmp->alternative[i].comment = tmp->comment;
+                            tmp->alternative[i].comment_dot = tmp->comment_dot;
+                            /* must zero the tmp, especially the lists */
+                            tmp->msgstr = NULL;
+                            tmp->msgstr_len = 0L;
+                            tmp->comment = NULL;
+                            tmp->comment_dot = NULL;
+                            i++;
+                        }
+                        { /* and one from B */
+                            tmp->alternative[i].id= xasprintf ("#-#-#-#-#  %s  #-#-#-#-#",
+                                                    identifications[1][k]);
+                            tmp->alternative[i].msgstr = new_msgstr;
+                            tmp->alternative[i].msgstr_len = mpb->msgstr_len;
+                            tmp->alternative[i].msgstr_end = new_msgstr + mpb->msgstr_len;
+                            tmp->alternative[i].comment = mpb->comment;
+                            tmp->alternative[i].comment_dot = mpb->comment_dot;
+                        }
                         tmp->alternative_count = i + 1;
                     }
                 }
@@ -459,7 +472,7 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 /* mpb removed from B - Orig. If A has the same one,
                    remove too.
                 */
-                if (message_equal(tmp, mpor, false)){
+                if (message_str_equal(tmp, mpor, false)){
                     tmp->msgstr = "";
                     tmp->msgstr_len = 0;
                     tmp->used = 0;
@@ -501,7 +514,7 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 break;
             }
             mpor = message_list_search (mlp_ordom, mp->msgctxt, mp->msgid);
-            if (!mpor || !message_equal(mp, mpor, true)) {
+            if (!mpor || !message_str_equal(mp, mpor, true)) {
                 tmp = message_copy (mp);
                 tmp->obsolete = mp->obsolete;
                 message_list_append (mlp_dom, tmp);
@@ -562,6 +575,7 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                   {
                     /* Concatenate the alternative msgstrs into a single one,
                        separated by markers.  */
+                    msg3way_has_merges = true;
                     size_t len;
                     const char *p;
                     const char *p_end;
@@ -636,6 +650,7 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 else
                   /* Concatenate the alternative comments into a single one,
                      separated by markers.  */
+                  msg3way_has_merges = true;
                   for (i = 0; i < tmp->alternative_count; i++)
                     {
                       string_list_ty *slp = tmp->alternative[i].comment;
@@ -660,7 +675,8 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                 if (i == tmp->alternative_count)
                   /* All alternatives are equal.  */
                   tmp->comment_dot = first->comment_dot;
-                else
+                else {
+                  msg3way_has_merges = true;
                   /* Concatenate the alternative dot comments into a single one,
                      separated by markers.  */
                   for (i = 0; i < tmp->alternative_count; i++)
@@ -677,6 +693,7 @@ UTF-8 encoded from the beginning, i.e. already in your source code files.\n"),
                             message_comment_dot_append (tmp, slp->item[l]);
                         }
                     }
+                }
               }
           }
       }

@@ -32,7 +32,7 @@ extern "C" {
 
 /* If true, omit the header entry.
    If false, keep the header entry present in the input.  */
-extern DLL_VARIABLE bool omit_header;
+extern DLL_VARIABLE bool msg3way_has_merges;
 
 extern msgdomain_list_ty *
        merge_3way_msgdomain_list (const char *a_file, const char* b_file,

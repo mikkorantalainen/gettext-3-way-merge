@@ -289,6 +289,8 @@ There is NO WARRANTY, to the extent permitted by law.\n\
   /* Write the PO file.  */
   msgdomain_list_print (result, output_file, output_syntax, force_po, false);
 
+  if (msg3way_has_merges)
+      exit(EXIT_FAILURE);
   exit (EXIT_SUCCESS);
 }
 
