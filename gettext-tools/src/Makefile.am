@@ -25,7 +25,7 @@ DISTCLEANFILES =
 RM = rm -f
 
 bin_PROGRAMS = \
-msgcmp msgfmt msgmerge msgunfmt xgettext \
+msgcmp msgfmt msgmerge msgunfmt msg3way xgettext \
 msgattrib msgcat msgcomm msgconv msgen msgexec msgfilter msggrep msginit msguniq \
 recode-sr-latin
 
@@ -40,7 +40,7 @@ str-list.h \
 color.h write-catalog.h write-po.h write-properties.h write-stringtable.h \
 dir-list.h file-list.h po-gram-gen.h po-gram-gen2.h \
 msgl-charset.h msgl-equal.h msgl-iconv.h msgl-ascii.h msgl-cat.h msgl-header.h \
-msgl-english.h msgl-check.h msgl-fsearch.h msgfmt.h msgunfmt.h \
+msgl-english.h msgl-check.h msgl-fsearch.h msgfmt.h msgunfmt.h msgl-3way.h\
 plural-count.h plural-eval.h plural-distrib.h \
 read-mo.h write-mo.h \
 read-java.h write-java.h \
@@ -125,7 +125,7 @@ $(COMMON_SOURCE) read-catalog.c \
 color.c write-catalog.c write-properties.c write-stringtable.c write-po.c \
 msgl-ascii.c msgl-iconv.c msgl-equal.c msgl-cat.c msgl-header.c msgl-english.c \
 msgl-check.c file-list.c msgl-charset.c po-time.c plural-exp.c plural-eval.c \
-plural-table.c \
+plural-table.c msgl-3way.c\
 $(FORMAT_SOURCE)
 
 # msggrep needs pattern matching.
@@ -166,6 +166,7 @@ msgcat_SOURCES = msgcat.c
 else
 msgcat_SOURCES = ../woe32dll/c++msgcat.cc
 endif
+msg3way_SOURCES = msg3way.c
 if !WOE32DLL
 msgcomm_SOURCES = msgcomm.c
 else
@@ -251,6 +252,7 @@ msgunfmt_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 xgettext_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ @LTLIBEXPAT@ $(WOE32_LDADD)
 msgattrib_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgcat_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
+msg3way_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgcomm_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgconv_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgen_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
@@ -268,6 +270,7 @@ msgunfmt_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_
 xgettext_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgattrib_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgcat_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
+msg3way_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgcomm_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgconv_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgen_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
@@ -288,6 +291,7 @@ msgunfmt_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
 xgettext_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
 msgattrib_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
 msgcat_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
+msg3way_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
 msgcomm_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
 msgconv_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
 msgen_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
@@ -307,6 +311,7 @@ msgunfmt_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 xgettext_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msgattrib_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msgcat_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
+msg3way_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msgcomm_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msgconv_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msgen_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
@@ -333,6 +338,10 @@ msgattrib_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 msgcat_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
 	$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(msgcat_LDFLAGS) $(LDFLAGS) \
+	-o $@
+msg3way_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
+	$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(msg3way_LDFLAGS) $(LDFLAGS) \
 	-o $@
 msgcomm_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
@@ -378,6 +387,10 @@ msgattrib_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 msgcat_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
 	$(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(msgcat_LDFLAGS) $(LDFLAGS) \
+	-o $@
+msg3way_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
+	$(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(msg3way_LDFLAGS) $(LDFLAGS) \
 	-o $@
 msgcomm_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \

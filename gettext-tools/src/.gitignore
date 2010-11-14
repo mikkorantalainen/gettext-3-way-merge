@@ -6,3 +6,26 @@
 /po-gram-gen.h
 /po-gram-gen2.h
 
+/.libs/
+/Makefile
+/hostname
+/libgettextsrc.la
+/msg3way
+/msgattrib
+/msgcat
+/msgcmp
+/msgcomm
+/msgconv
+/msgen
+/msgexec
+/msgfilter
+/msgfmt
+/msggrep
+/msginit
+/msgmerge
+/msgunfmt
+/msguniq
+/recode-sr-latin
+/urlget
+/user-email
+/xgettext
