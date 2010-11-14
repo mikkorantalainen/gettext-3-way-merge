@@ -381,3 +381,4 @@
 /term_styled_ostream.priv.h
 /term_styled_ostream.vt.h
 
+/waitpid.c

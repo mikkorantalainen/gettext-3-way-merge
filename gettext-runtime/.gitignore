@@ -8,3 +8,5 @@
 /config.h.in
 /configure
 
+*.o
+*.lo

@@ -10,3 +10,5 @@
 # Other files brought in by autogen.sh:
 /ABOUT-NLS
 
+*.o
+*.lo
