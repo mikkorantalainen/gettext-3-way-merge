@@ -208,6 +208,35 @@ message_equal (const message_ty *mp1, const message_ty *mp2,
 }
 
 bool
+message_str_equal (const message_ty *mp1, const message_ty *mp2,
+               bool ignore_potcdate)
+{
+  size_t i, i1, i2;
+
+  if (!(mp1->msgctxt != NULL
+        ? mp2->msgctxt != NULL && strcmp (mp1->msgctxt, mp2->msgctxt) == 0
+        : mp2->msgctxt == NULL))
+    return false;
+
+  if (strcmp (mp1->msgid, mp2->msgid) != 0)
+    return false;
+
+  if (!(mp1->msgid_plural != NULL
+        ? mp2->msgid_plural != NULL
+          && strcmp (mp1->msgid_plural, mp2->msgid_plural) == 0
+        : mp2->msgid_plural == NULL))
+    return false;
+
+  if (is_header (mp1) && ignore_potcdate
+      ? !msgstr_equal_ignoring_potcdate (mp1->msgstr, mp1->msgstr_len,
+                                         mp2->msgstr, mp2->msgstr_len)
+      : !msgstr_equal (mp1->msgstr, mp1->msgstr_len,
+                       mp2->msgstr, mp2->msgstr_len))
+    return false;
+  return true;
+}
+
+bool
 message_list_equal (const message_list_ty *mlp1, const message_list_ty *mlp2,
                     bool ignore_potcdate)
 {

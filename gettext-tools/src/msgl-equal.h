@@ -38,6 +38,11 @@ extern bool
 extern bool
        message_equal (const message_ty *mp1, const message_ty *mp2,
                       bool ignore_potcdate);
+
+/* Test if the two messages have the same translations */
+extern bool
+       message_str_equal (const message_ty *mp1, const message_ty *mp2,
+                      bool ignore_potcdate);
 extern bool
        message_list_equal (const message_list_ty *mlp1,
                            const message_list_ty *mlp2,
