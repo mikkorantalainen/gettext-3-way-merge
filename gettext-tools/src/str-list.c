@@ -234,3 +234,36 @@ string_list_member (const string_list_ty *slp, const char *s)
       return true;
   return false;
 }
+
+void string_list_remove_if (string_list_ty *slp, 
+                            bool (*condition)(const char *s))
+{
+  size_t i, j;
+  if (!slp)
+      return;
+  
+  /* note that it will also remove NULL strings */
+  for (i = j = 0; i < slp->nitems; i++)
+      if (!slp->item[i] || (*condition)(slp->item[i]))
+          continue;
+      else if (i > j)
+          slp->item[j++] = slp->item[i];
+
+  slp->nitems = j;
+}
+
+void string_list_collapse_if (string_list_ty *slp,
+                              bool (*condition)(const char *s, const char *s2))
+{
+  size_t i, j;
+  if (!slp)
+      return;
+
+  for (i = j = 1; i < slp->nitems; i++)
+      if (!slp->item[i] || (*condition)(slp->item[i-1], slp->item[i]))
+          continue;
+      else if (i > j)
+          slp->item[j++] = slp->item[i];
+
+  slp->nitems = j;
+}

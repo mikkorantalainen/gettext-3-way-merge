@@ -80,6 +80,16 @@ extern char *string_list_join (const string_list_ty *slp, const char *separator,
 extern bool string_list_member (const string_list_ty *slp, const char *s);
 
 
+/* Remove all the strings from thiss list that match condition.  */
+extern void string_list_remove_if (string_list_ty *slp, 
+                                 bool (*condition)(const char *s));
+
+/* Reduce the list according to condition.
+  Condition is fed with string N and string N+1 and will remove N+1 if true.
+*/
+extern void string_list_collapse_if (string_list_ty *slp,
+                                 bool (*condition)(const char *s, const char *s2));
+
 #ifdef __cplusplus
 }
 #endif
