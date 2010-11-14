@@ -129,6 +129,9 @@ message_alloc (const char *msgctxt,
   mp->prev_msgid_plural = NULL;
   mp->used = 0;
   mp->obsolete = false;
+  mp->tmp = NULL;
+  mp->alternative = NULL;
+  mp->alternative_count = 0;
   return mp;
 }
 
