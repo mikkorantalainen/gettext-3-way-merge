@@ -52,7 +52,7 @@ bool msg3way_has_merges = false;
 
 static bool str_ismergeline(const char *s)
 {
-    return strncmp("#-#-#-#-#", s, 9);
+    return (!strncmp("#-#-#-#-#", s, 9));
 }
 
 static bool str_isequal(const char *s1, const char* s2)
@@ -77,7 +77,9 @@ static bool msg3way_headers(message_ty* fin, const message_ty* remote)
             if (strcasestr(remote->comment->item[n], "copyright") &&
                 !string_list_member(fin->comment,remote->comment->item[n]))
               string_list_append(fin->comment,remote->comment->item[n]);
-        
+    
+    fin->is_fuzzy = false; /* headers shall never be fuzzy */
+    
     if (!remote->msgstr_len)
         return true;
     else if (!fin->msgstr_len){
