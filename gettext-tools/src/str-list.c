@@ -248,6 +248,7 @@ void string_list_remove_if (string_list_ty *slp,
           continue;
       else if (i > j)
           slp->item[j++] = slp->item[i];
+      else j++;
 
   slp->nitems = j;
 }
@@ -264,6 +265,7 @@ void string_list_collapse_if (string_list_ty *slp,
           continue;
       else if (i > j)
           slp->item[j++] = slp->item[i];
+      else j++;
 
   slp->nitems = j;
 }
